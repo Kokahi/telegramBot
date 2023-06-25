@@ -1,6 +1,8 @@
 package com.example.SpringNjc.options;
 
 import com.example.SpringNjc.config.BotCod;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -9,6 +11,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 
 @Component
+@Slf4j
+@ComponentScan
 public class telegramBot  extends TelegramLongPollingBot {
 
     final BotCod config;
@@ -36,10 +40,10 @@ public class telegramBot  extends TelegramLongPollingBot {
 
             switch (messageText) {
                 case "/start":
-                    startCommand(chatId, update.getMessage().getChat().getFirstName());
+                    startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
                     break;
-                default:
-                    sendMessge(chatId, "пара уехала в Киров");
+                    default:
+                    sendMessage(chatId, "пара уехала в Киров");
 
 
             }
@@ -47,14 +51,14 @@ public class telegramBot  extends TelegramLongPollingBot {
 
     }
 
-    private void startCommand(long chatId, String name) {
-        String answer = "Привет" + name + ", это NJC team!";
+    private void startCommandReceived(long chatId, String name)  {
+        String answer = "Привет," + name + " это NJC team!";
+         log.info("Replied to user" + name);
 
-        sendMessge(chatId, answer);
-
+            sendMessage(chatId, answer);
     }
 
-    private void sendMessge(long chadId, String textToSend) {
+    private void sendMessage(long chadId, String textToSend) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chadId));
         message.setText(textToSend);
@@ -62,6 +66,7 @@ public class telegramBot  extends TelegramLongPollingBot {
         try {
             execute(message);
         } catch (TelegramApiException e) {
+            log.error("Error occurred:" + e.getMessage());
 
 
         }
